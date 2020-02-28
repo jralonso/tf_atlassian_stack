@@ -52,7 +52,7 @@ resource "aws_s3_bucket" "logs" {
   acl    = "private"
 
   tags = {
-    Name = "${var.environment}-logs-s3"
-    Environment = "${var.environment}"
+    Name = "zdevco-logs-s3"
+    Environment = "zdevco"
   }
 }
