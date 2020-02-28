@@ -31,6 +31,10 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 # ############################################################
 # Database RDS
 # ############################################################
@@ -41,6 +45,7 @@ resource "aws_db_instance" "mysql" {
   engine                      = "mysql"
   engine_version              = "5.7"
   instance_class              = "db.t3.medium"
+  availability_zone           = "${data.aws_availability_zones.available.names[data.terraform_remote_state.vpc.outputs.indexAZ]}"
   name                        = "${var.mysql.dbname}"
   username                    = "${var.mysql.dbuser}"
   password                    = "${var.mysql.dbpass}"
