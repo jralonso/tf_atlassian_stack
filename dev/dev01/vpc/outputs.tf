@@ -31,3 +31,29 @@ output "profile" {
   value       = "${var.profile}"
   description = "AWS Profle"  
 }
+
+# Security groups
+output "bastion-sg" {
+  value       = "${aws_security_group.bastion.id}"
+  description = "AWS Profle"  
+}
+
+output "db-sg" {
+  value       = "${aws_security_group.db.id}"
+  description = "AWS Profle"  
+}
+
+output "jira-server-sg" {
+  value       = "${aws_security_group.jira-server.id}"
+  description = "AWS Profle"  
+}
+
+output "jira-front-lb-sg" {
+  value       = "${aws_security_group.front-lb.id}"
+  description = "AWS Profle"  
+}
+
+output "jira-internal-lb-sg" {
+  value       = "${aws_security_group.internal-lb.id}"
+  description = "AWS Profle"  
+}

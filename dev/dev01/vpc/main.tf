@@ -62,12 +62,12 @@ resource "aws_security_group" "bastion" {
 }
 
 # Database
-resource "aws_security_group" "rds" {
+resource "aws_security_group" "db" {
   name          = "${var.environment}-rds-sg"
   description   = "SG general access to database from zooplus network"
   ingress {
-    from_port   = "${var.rds.port}"
-    to_port     = "${var.rds.port}"
+    from_port   = "${var.dbport}"
+    to_port     = "${var.dbport}"
     protocol    = "tcp"
     security_groups = [aws_security_group.bastion.id, aws_security_group.jira-server.id]
   }
@@ -95,8 +95,8 @@ resource "aws_security_group" "jira-server" {
     cidr_blocks = ["77.225.25.138/32","212.230.26.242/32","213.97.254.165/32","91.223.129.16/29"]
   }
   egress {
-    from_port   = "${var.rds.port}"
-    to_port     = "${var.rds.port}"
+    from_port   = "${var.dbport}"
+    to_port     = "${var.dbport}"
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -121,7 +121,7 @@ resource "aws_security_group" "jira-server" {
 }
 
 # Front LB 
-resource "aws_security_group" "front" {
+resource "aws_security_group" "front-lb" {
   name = "${var.environment}-front-lb-sg"
   description   = "Access to Load Balancer from Internet"
   ingress {
@@ -149,7 +149,7 @@ resource "aws_security_group" "front" {
 }
 
 # Internal LB
-resource "aws_security_group" "int_lb_sg" {
+resource "aws_security_group" "internal-lb" {
   name = "${var.environment}-internal-lb-sg"
   description   = "Access to Load Balancer from VPC"
   ingress {
