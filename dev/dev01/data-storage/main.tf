@@ -35,19 +35,20 @@ data "terraform_remote_state" "vpc" {
 # Database RDS
 # ############################################################
 
-resource "aws_db_instance" "rds" {
-  allocated_storage           = "${var.rds.allocated_storage}"
+resource "aws_db_instance" "mysql" {
+  allocated_storage           = "${var.mysql.allocated_storage}"
   storage_type                = "gp2"
   engine                      = "mysql"
   engine_version              = "5.7"
   instance_class              = "db.t3.medium"
-  name                        = "${var.rds.dbname}"
-  username                    = "${var.rds.dbuser}"
-  password                    = "${var.rds.dbpass}"
-  parameter_group_name        = "${aws_db_parameter_group.rds.id}"
+  name                        = "${var.mysql.dbname}"
+  username                    = "${var.mysql.dbuser}"
+  password                    = "${var.mysql.dbpass}"
+  parameter_group_name        = "${aws_db_parameter_group.mysql.id}"
   option_group_name           = "default:mysql-5-7"
-  port                        = var.rds.port
-  publicly_accessible         = "${var.rds.publicly_accessible}"
+  port                        = data.terraform_remote_state.vpc.outputs.dbport
+  availability_zone           = local.subnet_id
+  publicly_accessible         = "${var.mysql.publicly_accessible}"
   vpc_security_group_ids      = [data.terraform_remote_state.vpc.outputs.db-sg]
   storage_encrypted           = false
   multi_az                    = false
@@ -56,14 +57,15 @@ resource "aws_db_instance" "rds" {
   auto_minor_version_upgrade  = true
   apply_immediately           = false
   final_snapshot_identifier   = "terraform-mysql"
-  skip_final_snapshot         = "${var.rds.skip_final_snapshot}"
+  skip_final_snapshot         = "${var.mysql.skip_final_snapshot}"
 
   tags = {
-    environment = var.environment
+    Name = "${data.terraform_remote_state.vpc.outputs.environment} Database"
+    Environment = "${data.terraform_remote_state.vpc.outputs.environment}"
   }
 }
 
-resource "aws_db_parameter_group" "rds" {
+resource "aws_db_parameter_group" "mysql" {
   family = "mysql5.7"
   description = "Parameters for Jira MySQL 5.7"
 
