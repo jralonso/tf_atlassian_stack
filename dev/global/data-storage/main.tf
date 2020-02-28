@@ -1,11 +1,12 @@
 provider "aws" { 
-  profile = var.profile
-  region  = var.region
+  profile = "${var.profile}"
+  region  = "${var.region}"
 }
 
 # Bucket for remote state storage
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "zdevco-tf-state"
+  acl    = "private"
   # Enable versioning so we can see the full revision history of our
   # state files
   versioning {
@@ -29,5 +30,18 @@ resource "aws_dynamodb_table" "terraform_locks" {
   attribute {
     name = "LockID"
     type = "S"
+  }
+}
+
+# Store terraform state in the S3 bucket
+terraform {
+  backend "s3" {
+    # Replace this with your bucket name!
+    bucket         = "zdevco-tf-state"
+    key            = "global/s3/terraform.tfstate"
+    region         = "eu-central-1"
+    # Replace this with your DynamoDB table name!
+    dynamodb_table = "zdevco-tf-locks"
+    encrypt        = true
   }
 }
