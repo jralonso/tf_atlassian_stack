@@ -1,5 +1,5 @@
 provider "aws" { 
-  profile = "${data.terraform_remote_state.vpc.outputs.environment}"
+  profile = "${data.terraform_remote_state.vpc.outputs.profile}"
   region  = "${data.terraform_remote_state.vpc.outputs.region}"
 }
 
@@ -20,7 +20,7 @@ terraform {
   }
 }
 
-# Retrieve state of other terraform stacks
+# Retrieve state of other terraform stacks (VPC)
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
@@ -45,7 +45,7 @@ resource "aws_instance" "bastion" {
   key_name                    = "${var.key_name}"
   disable_api_termination     = false
   monitoring                  = false
-  vpc_security_group_ids      = [data.terraform_remote_state.vpc.outputs.bastion-sg.id]
+  vpc_security_group_ids      = [data.terraform_remote_state.vpc.outputs.bastion-sg]
 
   user_data = <<-EOT
           #!/bin/bash -ex
@@ -56,7 +56,7 @@ resource "aws_instance" "bastion" {
           EOT
 
   tags = {
-    Name = "Env [${var.environment}] Bastion AZ"
-    Environment = var.environment
+    Name = "Env [${data.terraform_remote_state.vpc.outputs.environment}] Bastion AZ"
+    Environment = "${data.terraform_remote_state.vpc.outputs.environment}"
   }  
 }
