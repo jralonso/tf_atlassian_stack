@@ -93,7 +93,7 @@ resource "aws_instance" "jira" {
 
   tags = {
     Name = "[${local.environment}] Jira Server"
-    Environment = "${${local.environment}}"
+    Environment = "${local.environment}"
   }  
 }
 
