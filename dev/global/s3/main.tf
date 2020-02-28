@@ -45,3 +45,14 @@ terraform {
     encrypt        = true
   }
 }
+
+# Bucket for logging
+resource "aws_s3_bucket" "logs" {
+  bucket = "zdevco-tf-logging"
+  acl    = "private"
+
+  tags = {
+    Name = "${var.environment}-logs-s3"
+    Environment = "${var.environment}"
+  }
+}
