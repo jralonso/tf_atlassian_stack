@@ -1,1 +1,3 @@
 vc_tf_atlassian_stack.code-workspace
+**/*.tfstate
+**/*.tfstate.backup
