@@ -48,12 +48,12 @@ output "jira-server-sg" {
   description = "AWS Profle"  
 }
 
-output "jira-front-lb-sg" {
+output "front-lb-sg" {
   value       = "${aws_security_group.front-lb.id}"
   description = "AWS Profle"  
 }
 
-output "jira-internal-lb-sg" {
+output "internal-lb-sg" {
   value       = "${aws_security_group.internal-lb.id}"
   description = "AWS Profle"  
 }
