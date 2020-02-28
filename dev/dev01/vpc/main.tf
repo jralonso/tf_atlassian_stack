@@ -92,7 +92,7 @@ resource "aws_security_group" "jira-server" {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = ["77.225.25.138/32","212.230.26.242/32","213.97.254.165/32","91.223.129.16/29"]
+    cidr_blocks = ["77.225.25.138/32","212.230.26.242/32","213.97.254.165/32","91.223.129.16/29","172.31.0.0/16"]
   }
   egress {
     from_port   = "${var.dbport}"
@@ -156,25 +156,25 @@ resource "aws_security_group" "internal-lb" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    security_groups = [aws_security_group.jira-server.id]
+    cidr_blocks = ["172.31.0.0/16"]
   }
   ingress {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    security_groups = [aws_security_group.jira-server.id]
+    cidr_blocks = ["172.31.0.0/16"]
   }
   egress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    security_groups = [aws_security_group.jira-server.id]
+    cidr_blocks = ["172.31.0.0/16"]
   }
   egress {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    security_groups = [aws_security_group.jira-server.id]
+    cidr_blocks = ["172.31.0.0/16"]
   }
   tags = {
     Name  = "${var.environment}-internal-lb-sg"
