@@ -47,7 +47,7 @@ resource "aws_db_instance" "mysql" {
   parameter_group_name        = "${aws_db_parameter_group.mysql.id}"
   option_group_name           = "default:mysql-5-7"
   port                        = data.terraform_remote_state.vpc.outputs.dbport
-  availability_zone           = local.subnet_id
+  db_subnet_group_name        = aws_db_subnet_group.mysql.name
   publicly_accessible         = "${var.mysql.publicly_accessible}"
   vpc_security_group_ids      = [data.terraform_remote_state.vpc.outputs.db-sg]
   storage_encrypted           = false
@@ -62,6 +62,15 @@ resource "aws_db_instance" "mysql" {
   tags = {
     Name = "${data.terraform_remote_state.vpc.outputs.environment} Database"
     Environment = "${data.terraform_remote_state.vpc.outputs.environment}"
+  }
+}
+
+resource "aws_db_subnet_group" "mysql" {
+  name       = "${data.terraform_remote_state.vpc.outputs.environment}-subnet-gr"
+  subnet_ids = data.terraform_remote_state.vpc.outputs.col_nets
+
+  tags = {
+    Name = "${data.terraform_remote_state.vpc.outputs.profile} DB subnet group"
   }
 }
 
