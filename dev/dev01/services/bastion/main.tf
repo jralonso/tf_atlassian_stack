@@ -56,7 +56,7 @@ resource "aws_instance" "bastion" {
           EOT
 
   tags = {
-    Name = "Env [${data.terraform_remote_state.vpc.outputs.environment}] Bastion AZ"
+    Name = "[${data.terraform_remote_state.vpc.outputs.environment}] Bastion"
     Environment = "${data.terraform_remote_state.vpc.outputs.environment}"
   }  
 }
