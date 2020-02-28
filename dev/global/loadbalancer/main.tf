@@ -31,7 +31,7 @@ data "terraform_remote_state" "vpc" {
 # Front Application Load Balancer
 # ############################################################
 
-resource "aws_lb" "front_lb" {
+resource "aws_lb" "front" {
   name               = "${data.terraform_remote_state.vpc.outputs.environment}-front-lb"
   internal           = false
   load_balancer_type = "application"
@@ -40,11 +40,11 @@ resource "aws_lb" "front_lb" {
 
   enable_deletion_protection = false
 
-  access_logs {
-    bucket  = "zdevco-tf-logging"
-    prefix  = "${data.terraform_remote_state.vpc.outputs.environment}-front-lb"
-    enabled = true
-  }
+#   access_logs {
+#     bucket  = "zdevco-tf-logging"
+#     prefix  = "${data.terraform_remote_state.vpc.outputs.environment}-front-lb"
+#     enabled = true
+#   }
 
   tags = {
     Name = "${data.terraform_remote_state.vpc.outputs.environment}-front-lb"
@@ -53,20 +53,20 @@ resource "aws_lb" "front_lb" {
 }
 
 resource "aws_lb_listener" "front" {
-  load_balancer_arn = aws_lb.front_lb.arn
+  load_balancer_arn = aws_lb.front.arn
   port              = "80"
   protocol          = "HTTP"
   
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.front_lb_tg.arn
+    target_group_arn = aws_lb_target_group.front.arn
   }
 }
 
-resource "aws_lb_target_group" "front_lb_tg" {
-  name     = "tf-front-lb-tg"
+resource "aws_lb_target_group" "front" {
+  name     = "${data.terraform_remote_state.vpc.outputs.environment}-front-tg"
   protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  vpc_id   = "${data.terraform_remote_state.vpc.outputs.vpc_id}"
   port     = 8080
 
   lifecycle {
@@ -75,12 +75,11 @@ resource "aws_lb_target_group" "front_lb_tg" {
     }
 }
 
-resource "aws_lb_target_group_attachment" "front_lb_jira" {
-  count            = var.numAZs
-  target_group_arn = aws_lb_target_group.front_lb_tg.arn
-  target_id        = aws_instance.jiraserver[count.index].id
-  port = 8080
-}
+# resource "aws_lb_target_group_attachment" "front_jira" {
+#   target_group_arn = aws_lb_target_group.front_lb_tg.arn
+#   target_id        = aws_instance.jiraserver[count.index].id
+#   port = 8080
+# }
 
 # ############################################################
 # Internal Application Load Balancer
@@ -94,11 +93,11 @@ resource "aws_lb" "internal" {
 
   enable_deletion_protection = false
 
-  access_logs {
-    bucket  = "zdevco-tf-logging"
-    prefix  = "${data.terraform_remote_state.vpc.outputs.environment}-internal-lb"
-    enabled = true
-  }
+#   access_logs {
+#     bucket  = "zdevco-tf-logging"
+#     prefix  = "${data.terraform_remote_state.vpc.outputs.environment}-internal-lb"
+#     enabled = true
+#   }
 
   tags = {
     Name = "${data.terraform_remote_state.vpc.outputs.environment}-internal-lb"
