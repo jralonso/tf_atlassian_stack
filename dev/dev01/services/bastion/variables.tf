@@ -17,3 +17,13 @@ variable "bastion_instancetype" {
 variable "key_name" {
   default = "devColl"
 }
+
+# Key Pairs
+variable "key_name" {
+  default = "devColl"
+}
+
+# Key Pairs
+variable "bucketDBbackup" {
+  default = "devcollaboration001.s3.eu-central-1.amazonaws.com/dev-jira-02_backup.sql.bz2"
+}

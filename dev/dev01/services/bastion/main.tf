@@ -31,6 +31,17 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
+# Retrieve state of other terraform stacks (VPC)
+data "terraform_remote_state" "db" {
+  backend = "s3"
+  config = {
+    # Replace this with your bucket name!
+    bucket = "zdevco-tf-state"
+    key    = "dev/dev01/data-storage/terraform.tfstate"
+    region = "eu-central-1"
+  }
+}
+
 # ############################################################
 # Bastion Host
 # ############################################################
@@ -53,6 +64,18 @@ resource "aws_instance" "bastion" {
           # Documentation: https://dev.mysql.com/doc/mysql-repo-excerpt/5.7/en/linux-installation-yum-repo.html
           yum install -y https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm          
           yum install -y mysql-community-client
+          # Download database backup
+          aws s3 cp s3://"${var.bucketDBbackup}" /tmp
+          # Decompress database backup
+          sudo bzip2 -d /tmp/"${var.bucketDBbackup}"
+          # Set up database
+          echo "DROP DATABASE IF EXISTS ${data.terraform_remote_state.db.outputs.dbname};" >> /tmp/setup.mysql
+          #echo "CREATE DATABASE ${JiraDBName} CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;" >> /tmp/setup.mysql
+          echo "CREATE USER '${data.terraform_remote_state.db.outputs.dbuser}'@'%' IDENTIFIED BY '${data.terraform_remote_state.vpc.outputs.dbpass}';" >> /tmp/setup.mysql
+          echo "GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,REFERENCES,ALTER,INDEX on ${data.terraform_remote_state.db.outputs.dbuser}.* TO '${data.terraform_remote_state.db.outputs.dbuser}'@'%';" >> /tmp/setup.mysql
+          echo "FLUSH PRIVILEGES;" >> /tmp/setup.mysql
+          mysql -u${data.terraform_remote_state.db.outputs.dbuser} -p${data.terraform_remote_state.db.outputs.dbpass} -h${data.terraform_remote_state.db.outputs.dbendpoint} < /tmp/setup.mysql
+          mysql -u${data.terraform_remote_state.db.outputs.dbuser} -p${data.terraform_remote_state.db.outputs.dbpass} -h${data.terraform_remote_state.db.outputs.dbendpoint} < /tmp/dev-jira-02_backup.sql
           EOT
 
   tags = {
