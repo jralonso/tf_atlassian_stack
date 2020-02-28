@@ -5,7 +5,7 @@ provider "aws" {
 
 # Bucket for remote state storage
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "devc-tf-state"
+  bucket = "zdevco-tf-state"
   # Enable versioning so we can see the full revision history of our
   # state files
   versioning {
@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "terraform_state" {
 
 # Dynamo DB for locking state
 resource "aws_dynamodb_table" "terraform_locks" {
-  name         = "devc-tf-locks"
+  name         = "zdevco-tf-locks"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
   attribute {
