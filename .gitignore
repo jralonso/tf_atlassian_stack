@@ -1,3 +1,15 @@
 vc_tf_atlassian_stack.code-workspace
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
 **/*.tfstate
 **/*.tfstate.backup
+
+# Ignore override files as they are usually used to override resources locally and so
+# are not checked in
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
